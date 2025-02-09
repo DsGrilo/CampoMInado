@@ -6,19 +6,26 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ShadowButton extends JButton {
-    ImageIcon redFLag = new ImageIcon("src/assets/redflag.png");
+    public static ImageIcon redFLag = new ImageIcon("src/assets/redflag.png");
     private ImageIcon icon;
+    public static int flags = 40;
 
-    public ShadowButton(ImageIcon icon, String text) {
+    public ShadowButton(String text) {
         super(text);
-        setContentAreaFilled(false); // Torna o fundo do botão transparente
-        setFocusPainted(false); // Remove o contorno de foco
+        setContentAreaFilled(false);
+        setFocusPainted(false);
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    repaintIcon(redFLag);
+                    if(icon == null && flags > 0){
+                        repaintIcon(redFLag);
+                        removeFlags();
+                    }else{
+                        repaintIcon(null);
+                        addFLags();
+                    }
                 }
             }
         });
@@ -73,5 +80,13 @@ public class ShadowButton extends JButton {
         blue = (int) (blue + (255 - blue) * factor);
 
         return new Color(red, green, blue);
+    }
+
+    public void removeFlags() {
+        flags -= 1;
+    }
+
+    public void addFLags(){
+        flags += 1;
     }
 }

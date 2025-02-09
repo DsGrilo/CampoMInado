@@ -17,16 +17,22 @@ public class BuilderUI implements ActionListener {
     AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(explosionAudio);
     Clip explosionClip = AudioSystem.getClip();
 
-
     private static final int numberMInes = 30;
     private static final int size = 16;
+    private int timerCount = 0;
+    private int clicksCount = 0;
+    private Timer timer;
 
     JFrame frame = new JFrame();
     JPanel panelButton = new JPanel();
     ShadowButton[][] buttonList = new ShadowButton[size][size];
     boolean[][] minesLocation = new boolean[size][size];
     int[][] distance = new int[size][size];
+    JLabel clicksCountLabel = new JLabel();
+    JLabel timerLabel = new JLabel();
+    JLabel redFlagLabel = new JLabel();
 
+    JPanel infoPanel = new JPanel();
     Random rand = new Random();
 
     public BuilderUI() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
@@ -51,12 +57,68 @@ public class BuilderUI implements ActionListener {
         calculateProximity();
 
         frame.add(panelButton, BorderLayout.CENTER);
+        defineMenuInfo();
     }
 
+
+    public void defineMenuInfo(){
+        clicksCountLabel.setBackground(new Color(25, 25,25));
+        clicksCountLabel.setForeground(new Color(25,255,0));
+        clicksCountLabel.setFont(new Font("Ink Free", Font.BOLD, 40));
+        clicksCountLabel.setText(String.format("%03d", clicksCount));
+        clicksCountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        clicksCountLabel.setOpaque(true);
+
+        timerLabel.setBackground(new Color(25, 25,25));
+        timerLabel.setForeground(new Color(25,255,0));
+        timerLabel.setFont(new Font("Ink Free", Font.BOLD, 40));
+        timerLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        timerLabel.setText("000");
+        timerLabel.setOpaque(true);
+
+        redFlagLabel.setBackground(new Color(25, 25,25));
+        redFlagLabel.setForeground(new Color(25,255,0));
+        redFlagLabel.setFont(new Font("Ink Free", Font.BOLD, 40));
+        redFlagLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        redFlagLabel.setText(String.valueOf(ShadowButton.flags));
+        redFlagLabel.setOpaque(true);
+        redFlagLabel.setIcon(ShadowButton.redFLag);
+
+        infoPanel.setLayout(new GridLayout(1, 2));
+        infoPanel.add(timerLabel, BorderLayout.EAST);
+        infoPanel.add(redFlagLabel, BorderLayout.CENTER);
+        infoPanel.add(clicksCountLabel, BorderLayout.WEST);
+        infoPanel.setBackground(Color.black);
+
+        frame.add(infoPanel, BorderLayout.NORTH);
+
+    }
+
+    public void timer(boolean start){
+        if(timer == null){
+            timer = new Timer(1000, e -> {
+                timerCount++;
+                timerLabel.setText(String.format("%03d", timerCount));
+                repaintRedFLag();
+            });
+        }
+
+        if(start){
+            if(!timer.isRunning())
+                timer.start();
+        }else{
+            timer.stop();
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         var buttton = (JButton) e.getSource();
+        setClicksCount();
+
+        if(timerCount == 0){
+            timer(true);
+        }
 
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
@@ -64,6 +126,7 @@ public class BuilderUI implements ActionListener {
                     if(minesLocation[i][j]) {
                         buttonList[i][j].repaintIcon(image);
                         explosionClip.start();
+                        timer(false);
                         JOptionPane.showMessageDialog(null, "Você Explodiu!!");
                         restartGame();
                     }else {
@@ -77,6 +140,11 @@ public class BuilderUI implements ActionListener {
     }
 
     private void restartGame() {
+        repaintTimer();
+
+        ShadowButton.flags = 40;
+        repaintRedFLag();
+
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
                 buttonList[i][j].setText("");
@@ -92,6 +160,23 @@ public class BuilderUI implements ActionListener {
         calculateProximity();
     }
 
+    private void repaintTimer() {
+        timerCount = 0;
+        timerLabel.setText(String.format("%03d", timerCount));
+        timerLabel.repaint();
+    }
+
+    private void repaintRedFLag(){
+        redFlagLabel.setText(String.valueOf(ShadowButton.flags));
+        redFlagLabel.repaint();
+    }
+
+    private void setClicksCount(){
+        clicksCount++;
+        clicksCountLabel.setText(String.format("%03d", clicksCount));
+        clicksCountLabel.repaint();
+    }
+
     private void showFields(int row, int col) {
         if(!buttonList[row][col].getText().isEmpty()){
             return;
@@ -102,6 +187,7 @@ public class BuilderUI implements ActionListener {
             showAdjacentFields(row, col);
         }else{
             buttonList[row][col].setText(String.valueOf(distance[row][col]));
+            buttonList[row][col].setBackground(Color.gray);
         }
     }
 
@@ -156,7 +242,7 @@ public class BuilderUI implements ActionListener {
     public void createButtons() {
         for (var i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                var button = new ShadowButton(image, "");
+                var button = new ShadowButton("");
                 button.setFocusable(false);
                 button.setPreferredSize(new Dimension(80, 120));
                 button.setFont(new Font("Arial", Font.BOLD, 20));
