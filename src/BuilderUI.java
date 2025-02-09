@@ -55,9 +55,9 @@ public class BuilderUI implements ActionListener {
         createButtons();
         generateNumberMInes();
         calculateProximity();
-
-        frame.add(panelButton, BorderLayout.CENTER);
         defineMenuInfo();
+        frame.add(panelButton, BorderLayout.CENTER);
+
     }
 
 
@@ -91,7 +91,6 @@ public class BuilderUI implements ActionListener {
         infoPanel.setBackground(Color.black);
 
         frame.add(infoPanel, BorderLayout.NORTH);
-
     }
 
     public void timer(boolean start){
@@ -145,6 +144,8 @@ public class BuilderUI implements ActionListener {
         ShadowButton.flags = 40;
         repaintRedFLag();
 
+        repaintClickCount();
+
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
                 buttonList[i][j].setText("");
@@ -158,6 +159,12 @@ public class BuilderUI implements ActionListener {
         explosionClip.setFramePosition(0);
         generateNumberMInes();
         calculateProximity();
+    }
+
+    private void repaintClickCount() {
+        clicksCount = 0;
+        clicksCountLabel.setText(String.format("%03d", clicksCount));
+        clicksCountLabel.repaint();
     }
 
     private void repaintTimer() {
