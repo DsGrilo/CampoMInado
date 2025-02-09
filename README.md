@@ -15,3 +15,21 @@ Este é um jogo de *Minesweeper* (Campo Minado) implementado em Java, utilizando
 
 - Java 17 ou superior.
 - Ambiente de desenvolvimento integrado (IDE) como IntelliJ IDEA, Eclipse ou NetBeans.
+
+1. **Clonar o repositório:**
+
+   ```bash
+   [git clone https://github.com/seu-usuario/jogo-minado-java-swing.git](https://github.com/DsGrilo/CampoMInado.git)](https://github.com/DsGrilo/CampoMInado.git)
+
+2. **Navegue até o diretório do projeto:**
+   ```bash
+      cd nome-do-jogo
+   
+3. **Compile o projeto**
+  ```bash
+   javac src/*.java -d out/
+```
+4. **Execute o jogo**
+  ```bash
+    java -cp out/ Main
+
